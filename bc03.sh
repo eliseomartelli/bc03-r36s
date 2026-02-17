@@ -1,4 +1,4 @@
 #!/bin/bash
-cd /roms/ports/bc03/
-chmod +x bc03
-./bc03
+cd /roms/ports/
+chmod +x bc03_r36s_static
+./bc03_r36s_static

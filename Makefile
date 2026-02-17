@@ -14,7 +14,7 @@ CC_R36S_CONTAINER= aarch64-linux-gnu-gcc # Compiler inside the Docker container
 CFLAGS_R36S_CONTAINER= -I/usr/include/SDL2 -I. -D_REENTRANT -O2 -Wall
 LIBS_R36S_CONTAINER  = -lSDL2 -lm
 
-.PHONY: all image r36s local clean
+.PHONY: all image r36s r36s-static local clean
 
 all: local
 
@@ -39,6 +39,13 @@ r36s: image
 	$(CC_R36S_CONTAINER) -o $(EXECUTABLE_R36S) $(SOURCES) $(CFLAGS_R36S_CONTAINER) $(LIBS_R36S_CONTAINER)
 	@echo "Successfully built $(EXECUTABLE_R36S) for R36S."
 	@echo "Transfer '$(EXECUTABLE_R36S)' to your device."
+
+r36s-static: image
+	@echo "Cross-Compiling for R36S (STATIC) inside Docker container..."
+	$(RUNTIME) run --rm -v "$(PWD):/app" -w /app $(IMG_NAME) \
+	/bin/bash -c "CC=$(CC_R36S_CONTAINER) $(CC_R36S_CONTAINER) -o $(EXECUTABLE_R36S)_static $(SOURCES) $(CFLAGS_R36S_CONTAINER) -static \$$(CC=$(CC_R36S_CONTAINER) /usr/bin/sdl2-config --static-libs)"
+	@echo "Successfully built $(EXECUTABLE_R36S)_static for R36S."
+	@echo "Transfer '$(EXECUTABLE_R36S)_static' to your device."
 
 -include $(OBJECTS_LOCAL:.local.o=.d)
 

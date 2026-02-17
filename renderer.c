@@ -19,27 +19,34 @@ void draw_filled_circle(SDL_Renderer *renderer, int cx, int cy, int radius) {
 
 void draw_rotated_rect(SDL_Renderer *renderer, int cx, int cy, float length,
                        float width, float angle, int offset_back) {
-  float half_w = width / 2.0f;
-
-  Pointf corners[4] = {{-half_w, (float)offset_back},
-                       {half_w, (float)offset_back},
-                       {half_w, -length},
-                       {-half_w, -length}};
-
-  SDL_Vertex vertices[4];
-  SDL_Color c;
-  SDL_GetRenderDrawColor(renderer, &c.r, &c.g, &c.b, &c.a);
-
-  for (int i = 0; i < 4; i++) {
-    Pointf rotated = rotate_point(corners[i], angle);
-    vertices[i].position.x = cx + rotated.x;
-    vertices[i].position.y = cy + rotated.y;
-    vertices[i].color = c;
-    vertices[i].tex_coord = (SDL_FPoint){0, 0};
+  static SDL_Texture *white_texture = NULL;
+  if (!white_texture) {
+    SDL_Surface *surface = SDL_CreateRGBSurface(0, 1, 1, 32, 0, 0, 0, 0);
+    SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 255));
+    white_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
   }
 
-  int indices[6] = {0, 1, 2, 0, 2, 3};
-  SDL_RenderGeometry(renderer, NULL, vertices, 4, indices, 6);
+  float abs_len = SDL_fabsf(length);
+  SDL_Rect real_dest = {cx - (int)(width / 2.0f),
+                        cy - (length > 0 ? (int)abs_len : 0), (int)width,
+                        (int)abs_len};
+
+  SDL_Point center = {(int)(width / 2.0f), (length > 0 ? (int)abs_len : 0)};
+
+  if (offset_back != 0) {
+    float rad = angle * (M_PI / 180.0f);
+    real_dest.x += (int)(SDL_sinf(rad) * offset_back);
+    real_dest.y -= (int)(SDL_cosf(rad) * offset_back);
+  }
+
+  Uint8 r, g, b, a;
+  SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
+  SDL_SetTextureColorMod(white_texture, r, g, b);
+  SDL_SetTextureAlphaMod(white_texture, a);
+
+  SDL_RenderCopyEx(renderer, white_texture, NULL, &real_dest, angle, &center,
+                   SDL_FLIP_NONE);
 }
 
 void render_face(SDL_Renderer *renderer, int cx, int cy) {
@@ -104,7 +111,7 @@ void render_hands(SDL_Renderer *renderer, int cx, int cy) {
                          current_theme.sec_hand_color.b, 255);
   draw_rotated_rect(renderer, cx, cy,
                     current_theme.clock_radius * current_theme.s_len,
-                    current_theme.s_width, ang_s, 30);
+                    current_theme.s_width, ang_s, -20);
 
   draw_filled_circle(renderer, cx, cy, 6);
 }

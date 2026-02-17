@@ -1,4 +1,7 @@
-FROM debian:bookworm
+FROM debian:buster
+
+RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.list && \
+    echo "deb http://archive.debian.org/debian-security buster/updates main" >> /etc/apt/sources.list
 
 RUN dpkg --add-architecture arm64
 
@@ -19,8 +22,7 @@ RUN apt-get update -y && \
     libdrm-dev:arm64 \
     libgbm-dev:arm64 \
     libwayland-dev:arm64 \
-    libxkbcommon-dev:arm64 \
-    libdecor-0-dev:arm64 && \
+    libxkbcommon-dev:arm64 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

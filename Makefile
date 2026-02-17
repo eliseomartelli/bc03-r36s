@@ -43,7 +43,7 @@ r36s: image
 r36s-static: image
 	@echo "Cross-Compiling for R36S (STATIC) inside Docker container..."
 	$(RUNTIME) run --rm -v "$(PWD):/app" -w /app $(IMG_NAME) \
-	/bin/bash -c "CC=$(CC_R36S_CONTAINER) $(CC_R36S_CONTAINER) -o $(EXECUTABLE_R36S)_static $(SOURCES) $(CFLAGS_R36S_CONTAINER) -static \$$(CC=$(CC_R36S_CONTAINER) /usr/bin/sdl2-config --static-libs)"
+	/bin/bash -c "CC=$(CC_R36S_CONTAINER) $(CC_R36S_CONTAINER) -o $(EXECUTABLE_R36S)_static $(SOURCES) $(CFLAGS_R36S_CONTAINER) \$$(CC=$(CC_R36S_CONTAINER) /usr/bin/sdl2-config --static-libs)"
 	@echo "Successfully built $(EXECUTABLE_R36S)_static for R36S."
 	@echo "Transfer '$(EXECUTABLE_R36S)_static' to your device."
 

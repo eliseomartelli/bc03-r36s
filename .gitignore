@@ -1,0 +1,20 @@
+# Executables
+bc03_local
+bc03_r36s
+
+# Object files
+*.local.o
+*.r36s.o
+
+# Dependency files
+*.local.d
+*.r36s.d
+
+# Editor/IDE specific files
+.clangd
+
+# Other build artifacts
+# In case 'make clean' fails or doesn't cover everything
+.DS_Store
+*.swp
+*~
